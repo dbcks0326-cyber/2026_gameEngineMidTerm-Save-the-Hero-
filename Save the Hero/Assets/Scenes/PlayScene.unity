@@ -363,7 +363,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 1
+  orthographic size: 3
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -580,7 +580,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -3271218404167720682, guid: 6bbd03e90b5e6724faec6295c7ed1695, type: 3}
+  m_Sprite: {fileID: 1897988573599394555, guid: 9aa6d9858c4ffe9489f0b49cecb7bcd4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -645,7 +645,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.7916667, y: 1}
+    oldSize: {x: 0.8333333, y: 0.9791667}
     newSize: {x: 0.38, y: 0.48}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

@@ -32,6 +32,27 @@ public class PlayerController : MonoBehaviour
 
         myAnimator.SetBool("move", Mathf.Abs(moveInput) > 0.1f);
 
+        float yVelocity = rb.linearVelocity.y;
+
+        if (!isGrounded)
+        {
+            if (yVelocity > 0.1f) 
+            {
+                myAnimator.SetBool("Jump", true);
+                myAnimator.SetBool("Fall", false);
+            }
+            else if (yVelocity < -0.1f) 
+            {
+                myAnimator.SetBool("Jump", false);
+                myAnimator.SetBool("Fall", true);
+            }
+        }
+        else
+        {
+            myAnimator.SetBool("Jump", false);
+            myAnimator.SetBool("Fall", false);
+        }
+
         if (moveInput > 0)
         {
             transform.localScale = new Vector3(1, 1, 1);
