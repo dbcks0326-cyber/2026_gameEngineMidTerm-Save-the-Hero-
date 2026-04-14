@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
         // 바닥 체크
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.3f, groundLayer);
 
 
 
@@ -109,7 +109,12 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(1, 1, 1);
         else if (moveInput < 0)
             transform.localScale = new Vector3(-1, 1, 1);
-      
+
+        if (isGrounded)
+        {
+            myAnimator.SetBool("Fall", false);
+            myAnimator.SetBool("Jump", false);
+        }
     }
 
 
