@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerController : MonoBehaviour
@@ -148,4 +149,22 @@ public class PlayerController : MonoBehaviour
             myAnimator.SetTrigger("Jump");
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+
+        if (collision.CompareTag("Respawn"))
+        { 
+
+        }
+        if (collision.CompareTag("Finish"))
+        {
+
+        }
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        collision.GetComponent<LevelObject>().MoveToNextLevel();
+
+        }
 }
