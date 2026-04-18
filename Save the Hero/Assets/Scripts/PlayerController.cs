@@ -1,11 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using static UnityEngine.Rendering.DebugUI;
+using System.Collections; // 필수!
 
 public class PlayerController : MonoBehaviour
 {
-
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
     public Transform groundCheck;
@@ -23,148 +22,104 @@ public class PlayerController : MonoBehaviour
     private bool wasGrounded;
     private float doubleJumpTimer = 0f;
 
+    [Header("Invincibility Settings")]
+    public bool isInvincible = false;
+    public float invincibilityTime = 3f;
+    private SpriteRenderer spriteRenderer; // 👈 변수 선언 추가됨!
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         myAnimator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>(); // 여기서 가져옴
     }
-
-
 
     private void Update()
     {
+        if (doubleJumpTimer > 0f) doubleJumpTimer -= Time.deltaTime;
 
-        if (doubleJumpTimer > 0f)
-        {
-            doubleJumpTimer -= Time.deltaTime;
-        }
-        // 이동
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
-
-        // 바닥 체크
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.3f, groundLayer);
 
-
-
-        // 🔥 착지 "순간"만 감지
         if (!wasGrounded && isGrounded)
         {
             jumpCount = 0;
-
-            // 🔥 남아있는 트리거 제거 (핵심)
             myAnimator.ResetTrigger("DoubleJump");
             myAnimator.ResetTrigger("Jump");
         }
-
         wasGrounded = isGrounded;
 
-        // 이동 애니
         myAnimator.SetBool("move", Mathf.Abs(moveInput) > 0.1f);
 
-        // ⭐ 점프 딜레이 (한 번만!)
         if (isPreparingJump)
         {
             jumpTimer -= Time.deltaTime;
-
             if (jumpTimer <= 0f)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-
                 isPreparingJump = false;
             }
         }
 
-        // ⭐ 점프 / 낙하 애니 (항상 실행)
         float yVelocity = rb.linearVelocity.y;
-
         if (!isGrounded || isPreparingJump)
         {
-            if (yVelocity > 0.1f)
-            {
-                myAnimator.SetBool("Jump", true);
-                myAnimator.SetBool("Fall", false);
-            }
-            else if (yVelocity < -0.1f)
-            {
-                // 🔥 더블점프 직후에는 Fall 막기
-                if (doubleJumpTimer <= 0f)
-                {
-                    myAnimator.SetBool("Fall", true);
-                    myAnimator.SetBool("Jump", false);
-                }
-            }
-            else if (isPreparingJump)
-            {
-                myAnimator.SetBool("Jump", true);
-            }
+            if (yVelocity > 0.1f) { myAnimator.SetBool("Jump", true); myAnimator.SetBool("Fall", false); }
+            else if (yVelocity < -0.1f) { if (doubleJumpTimer <= 0f) { myAnimator.SetBool("Fall", true); myAnimator.SetBool("Jump", false); } }
         }
-        else
-        {
-            myAnimator.SetBool("Jump", false);
-            myAnimator.SetBool("Fall", false);
-        }
+        else { myAnimator.SetBool("Jump", false); myAnimator.SetBool("Fall", false); }
 
-        // 방향
-        if (moveInput > 0)
-            transform.localScale = new Vector3(1, 1, 1);
-        else if (moveInput < 0)
-            transform.localScale = new Vector3(-1, 1, 1);
-
-        if (isGrounded)
-        {
-            myAnimator.SetBool("Fall", false);
-            myAnimator.SetBool("Jump", false);
-        }
+        if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
+        else if (moveInput < 0) transform.localScale = new Vector3(-1, 1, 1);
     }
 
-
-    public void OnMove(InputValue value)
-    {
-        Vector2 input = value.Get<Vector2>();
-        moveInput = input.x;
-
-    }
-
+    public void OnMove(InputValue value) { moveInput = value.Get<Vector2>().x; }
 
     public void OnJump(InputValue value)
     {
-        if (!value.isPressed) return;
-
-        if (jumpCount >= 2) return;
-
-        int currentJump = jumpCount;
+        if (!value.isPressed || jumpCount >= 2) return;
         jumpCount++;
-
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
-        if (currentJump == 1)
-        {
-            myAnimator.SetTrigger("DoubleJump");
-            doubleJumpTimer = 0.2f;
-        }
-        else
-        {
-            myAnimator.SetTrigger("Jump");
-        }
+        if (jumpCount == 2) { myAnimator.SetTrigger("DoubleJump"); doubleJumpTimer = 0.2f; }
+        else myAnimator.SetTrigger("Jump");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-
-        if (collision.CompareTag("Respawn"))
-        { 
-
+        if (collision.CompareTag("Item"))
+        {
+            Destroy(collision.gameObject);
+            StartCoroutine(InvincibilityRoutine()); // 👈 이제 빨간 줄 안 뜸!
+            return;
         }
+
+        if (collision.CompareTag("Respawn") || collision.CompareTag("Enemy"))
+        {
+            if (isInvincible) return;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            return;
+        }
+
         if (collision.CompareTag("Finish"))
         {
-
+            LevelObject lo = collision.GetComponent<LevelObject>();
+            if (lo != null) lo.MoveToNextLevel();
+            else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
+    }
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    // ⭐ 이 코루틴 함수가 반드시 클래스 안에 있어야 합니다!
+    private IEnumerator InvincibilityRoutine()
+    {
+        isInvincible = true;
+        if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
 
-        collision.GetComponent<LevelObject>().MoveToNextLevel();
+        yield return new WaitForSeconds(invincibilityTime);
 
-        }
+        if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        isInvincible = false;
+    }
 }
