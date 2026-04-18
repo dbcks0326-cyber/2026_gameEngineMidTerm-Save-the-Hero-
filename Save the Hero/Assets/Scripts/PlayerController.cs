@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using System.Collections; // 필수!
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement")]
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
     public Transform groundCheck;
@@ -14,30 +15,67 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private float moveInput;
     private Animator myAnimator;
-    private float jumpDelay = 0.25f;
-    private float jumpTimer = 0f;
-    private bool isPreparingJump = false;
     private int jumpCount = 0;
-    public int maxJumpCount = 1;
     private bool wasGrounded;
     private float doubleJumpTimer = 0f;
+   // private bool isPreparingJump = false;
+   // private float jumpTimer = 0f;
 
-    [Header("Invincibility Settings")]
+    [Header("Item: Speed Boost")]
+    public float speedBoostMultiplier = 2f;
+    public float speedBoostTime = 5f;
+    private float originalMoveSpeed;
+
+    [Header("Item: Invincibility")]
     public bool isInvincible = false;
     public float invincibilityTime = 3f;
-    private SpriteRenderer spriteRenderer; // 👈 변수 선언 추가됨!
+    private SpriteRenderer spriteRenderer;
+
+    [Header("Ghost Trail (잔상)")]
+    public GameObject ghostPrefab;      // 유니티에서 프리팹 드래그 앤 드롭 하세요!
+    public float ghostDelay = 0.07f;
+    private float ghostTimer;
+    private bool isMakingGhost = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         myAnimator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>(); // 여기서 가져옴
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        originalMoveSpeed = moveSpeed;
     }
 
     private void Update()
     {
-        if (doubleJumpTimer > 0f) doubleJumpTimer -= Time.deltaTime;
+        // 1. 잔상 생성 로직
+        if (isMakingGhost)
+        {
+            ghostTimer -= Time.deltaTime;
+            if (ghostTimer <= 0)
+            {
+                if (ghostPrefab != null)
+                {
+                    GameObject currentGhost = Instantiate(ghostPrefab, transform.position, transform.rotation);
+                    currentGhost.transform.localScale = transform.localScale;
 
+                    SpriteRenderer ghostSR = currentGhost.GetComponent<SpriteRenderer>();
+                    if (ghostSR != null)
+                    {
+                        if (ghostSR != null && spriteRenderer != null)
+                        {
+                            ghostSR.sprite = spriteRenderer.sprite;
+                            // 잔상이 너무 밝아서 안 보일 수 있으니 색상도 살짝 잡아줍니다.
+                            ghostSR.color = new Color(1f, 1f, 1f, 0.6f);
+                        }
+                    }
+                    Destroy(currentGhost, 0.3f);
+                }
+                ghostTimer = ghostDelay;
+            }
+        }
+
+        // 2. 이동 및 바닥 체크
+        if (doubleJumpTimer > 0f) doubleJumpTimer -= Time.deltaTime;
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.3f, groundLayer);
 
@@ -49,24 +87,14 @@ public class PlayerController : MonoBehaviour
         }
         wasGrounded = isGrounded;
 
+        // 3. 애니메이션 및 방향
         myAnimator.SetBool("move", Mathf.Abs(moveInput) > 0.1f);
 
-        if (isPreparingJump)
-        {
-            jumpTimer -= Time.deltaTime;
-            if (jumpTimer <= 0f)
-            {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-                rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-                isPreparingJump = false;
-            }
-        }
-
         float yVelocity = rb.linearVelocity.y;
-        if (!isGrounded || isPreparingJump)
+        if (!isGrounded)
         {
             if (yVelocity > 0.1f) { myAnimator.SetBool("Jump", true); myAnimator.SetBool("Fall", false); }
-            else if (yVelocity < -0.1f) { if (doubleJumpTimer <= 0f) { myAnimator.SetBool("Fall", true); myAnimator.SetBool("Jump", false); } }
+            else if (yVelocity < -0.1f && doubleJumpTimer <= 0f) { myAnimator.SetBool("Fall", true); myAnimator.SetBool("Jump", false); }
         }
         else { myAnimator.SetBool("Jump", false); myAnimator.SetBool("Fall", false); }
 
@@ -92,7 +120,14 @@ public class PlayerController : MonoBehaviour
         if (collision.CompareTag("Item"))
         {
             Destroy(collision.gameObject);
-            StartCoroutine(InvincibilityRoutine()); // 👈 이제 빨간 줄 안 뜸!
+            StartCoroutine(InvincibilityRoutine());
+            return;
+        }
+
+        if (collision.CompareTag("SpeedItem"))
+        {
+            Destroy(collision.gameObject);
+            StartCoroutine(SpeedBoostRoutine());
             return;
         }
 
@@ -111,15 +146,23 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ⭐ 이 코루틴 함수가 반드시 클래스 안에 있어야 합니다!
     private IEnumerator InvincibilityRoutine()
     {
         isInvincible = true;
-        if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
-
+        spriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
         yield return new WaitForSeconds(invincibilityTime);
-
-        if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        spriteRenderer.color = Color.white;
         isInvincible = false;
+    }
+
+    private IEnumerator SpeedBoostRoutine()
+    {
+        moveSpeed = originalMoveSpeed * speedBoostMultiplier;
+        isMakingGhost = true; // 💨 잔상 켜기
+
+        yield return new WaitForSeconds(speedBoostTime);
+
+        isMakingGhost = false; // 🛑 잔상 끄기
+        moveSpeed = originalMoveSpeed;
     }
 }

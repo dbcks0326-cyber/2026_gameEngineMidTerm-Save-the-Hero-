@@ -147,7 +147,12 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  maxJumpCount: 1
+  speedBoostMultiplier: 2
+  speedBoostTime: 5
+  isInvincible: 0
+  invincibilityTime: 3
+  ghostPrefab: {fileID: 1662659749999719040, guid: 865a39c8f16aa2f4b9f8c52f19d9d58e, type: 3}
+  ghostDelay: 0.06
 --- !u!114 &7118776779050465664
 MonoBehaviour:
   m_ObjectHideFlags: 0
