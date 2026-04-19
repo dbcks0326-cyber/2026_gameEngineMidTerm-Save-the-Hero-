@@ -18,8 +18,8 @@ public class PlayerController : MonoBehaviour
     private int jumpCount = 0;
     private bool wasGrounded;
     private float doubleJumpTimer = 0f;
-   // private bool isPreparingJump = false;
-   // private float jumpTimer = 0f;
+    // private bool isPreparingJump = false;
+    // private float jumpTimer = 0f;
 
     [Header("Item: Speed Boost")]
     public float speedBoostMultiplier = 2f;
@@ -144,6 +144,7 @@ public class PlayerController : MonoBehaviour
             if (lo != null) lo.MoveToNextLevel();
             else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
+
     }
 
     private IEnumerator InvincibilityRoutine()
@@ -164,5 +165,16 @@ public class PlayerController : MonoBehaviour
 
         isMakingGhost = false; // 🛑 잔상 끄기
         moveSpeed = originalMoveSpeed;
+    }
+    // 몬스터와 물리적으로 부딪혔을 때 (Is Trigger가 꺼져 있을 때)
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (isInvincible) return; // 무적 상태면 살려줌
+
+            // 씬 재시작 (죽음)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 }
