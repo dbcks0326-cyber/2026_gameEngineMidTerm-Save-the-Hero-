@@ -20,6 +20,10 @@ public class PlayerController : MonoBehaviour
     private float doubleJumpTimer = 0f;
     // private bool isPreparingJump = false;
     // private float jumpTimer = 0f;
+    [Header("Item: Jump Boost")]
+    public float jumpBoostMultiplier = 1.5f; // 얼마나 높게 뛸지 (1.5배)
+    public float jumpBoostTime = 5f;        // 지속 시간
+    private float originalJumpForce;         // 원래 점프 힘 저장용
 
     [Header("Item: Speed Boost")]
     public float speedBoostMultiplier = 2f;
@@ -43,6 +47,7 @@ public class PlayerController : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalMoveSpeed = moveSpeed;
+        originalJumpForce = jumpForce; // ⭐ 원래 점프 힘을 미리 저장!
     }
 
     private void Update()
@@ -131,7 +136,13 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (collision.CompareTag("Respawn") || collision.CompareTag("Enemy"))
+        if (collision.CompareTag("JumpItem")) // 태그 이름은 원하는 대로!
+        {
+            Destroy(collision.gameObject);
+            StartCoroutine(JumpBoostRoutine());
+            return;
+        }
+            if (collision.CompareTag("Respawn") || collision.CompareTag("Enemy"))
         {
             if (isInvincible) return;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -147,6 +158,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
+
     private IEnumerator InvincibilityRoutine()
     {
         isInvincible = true;
@@ -156,6 +168,19 @@ public class PlayerController : MonoBehaviour
         isInvincible = false;
     }
 
+    private IEnumerator JumpBoostRoutine()
+    {
+        jumpForce = originalJumpForce * jumpBoostMultiplier;
+
+        // 캐릭터 색상을 점프 물약 느낌(예: 초록색)으로 살짝 변경
+        Color originalColor = spriteRenderer.color;
+        spriteRenderer.color = new Color(0.5f, 1f, 0.5f, 1f);
+
+        yield return new WaitForSeconds(jumpBoostTime);
+
+        spriteRenderer.color = originalColor;
+        jumpForce = originalJumpForce; // 원래대로 복구
+    }
     private IEnumerator SpeedBoostRoutine()
     {
         moveSpeed = originalMoveSpeed * speedBoostMultiplier;
@@ -177,4 +202,6 @@ public class PlayerController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
+
+
 }
