@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8446716505076988665}
   - component: {fileID: 7361712391938549984}
   - component: {fileID: 3423332793947223346}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: "\uC2AC\uB77C\uC784"
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -220,7 +220,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8933374036780241138}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: GroundCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}

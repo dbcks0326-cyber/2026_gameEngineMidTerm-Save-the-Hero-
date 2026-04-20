@@ -142,18 +142,48 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(JumpBoostRoutine());
             return;
         }
-            if (collision.CompareTag("Respawn") || collision.CompareTag("Enemy"))
+        if (collision.CompareTag("Respawn"))
         {
             if (isInvincible) return;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             return;
         }
 
+        // 2. 적(Enemy) 태그 트리거 (보스 머리 등)
+        if (collision.CompareTag("Enemy"))
+        {
+            if (isInvincible) return;
+
+            // 떨어지는 중이 아닐 때만 죽음 (옆에서 닿았을 때)
+            if (rb.linearVelocity.y >= -0.1f)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+            // 떨어지는 중(밟는 중)이면 보스 스크립트가 처리하도록 가만히 둠
+        }
+        // PlayerController.cs 내부의 OnTriggerEnter2D 수정
         if (collision.CompareTag("Finish"))
         {
-            LevelObject lo = collision.GetComponent<LevelObject>();
-            if (lo != null) lo.MoveToNextLevel();
-            else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            // 1. 현재 맵에 보스가 있는지 확인합니다.
+            BossController boss = GameObject.FindObjectOfType<BossController>();
+
+            if (boss != null)
+            {
+                // 2. 보스가 있다면? 죽었을 때만 통과!
+                if (BossController.isBossDead)
+                {
+                    GoToNextLevel(collision);
+                }
+                else
+                {
+                    Debug.Log("보스를 아직 처치하지 않았습니다!");
+                }
+            }
+            else
+            {
+                // 3. 보스가 없는 일반 스테이지라면? 그냥 통과!
+                GoToNextLevel(collision);
+            }
         }
 
     }
@@ -202,6 +232,11 @@ public class PlayerController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
-
+    void GoToNextLevel(Collider2D collision)
+    {
+        LevelObject lo = collision.GetComponent<LevelObject>();
+        if (lo != null) lo.MoveToNextLevel();
+        else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
 
 }
