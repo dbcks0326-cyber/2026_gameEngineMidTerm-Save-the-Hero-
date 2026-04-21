@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
 
     [Header("Ghost Trail (잔상)")]
-    public GameObject ghostPrefab;      // 유니티에서 프리팹 드래그 앤 드롭 하세요!
+    public GameObject ghostPrefab;      // 유니티에서 프리팹 드래그 앤 드롭
     public float ghostDelay = 0.07f;
     private float ghostTimer;
     private bool isMakingGhost = false;
@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalMoveSpeed = moveSpeed;
-        originalJumpForce = jumpForce; // ⭐ 원래 점프 힘을 미리 저장!
+        originalJumpForce = jumpForce; // ⭐ 원래 점프 힘을 미리 저장
     }
 
     private void Update()
@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
                         if (ghostSR != null && spriteRenderer != null)
                         {
                             ghostSR.sprite = spriteRenderer.sprite;
-                            // 잔상이 너무 밝아서 안 보일 수 있으니 색상도 살짝 잡아줍니다.
+                            // 잔상이 너무 밝아서 안 보일 수 있으니 색상잡기
                             ghostSR.color = new Color(1f, 1f, 1f, 0.6f);
                         }
                     }
@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (collision.CompareTag("JumpItem")) // 태그 이름은 원하는 대로!
+        if (collision.CompareTag("JumpItem")) 
         {
             Destroy(collision.gameObject);
             StartCoroutine(JumpBoostRoutine());
@@ -156,7 +156,7 @@ public class PlayerController : MonoBehaviour
 
             if (boss != null && rb.linearVelocity.y < -0.1f)
             {
-                boss.TakeDamage(); // 보스 대미지!
+                boss.TakeDamage(); // 보스 대미지
 
                 // 플레이어 반동
                 rb.linearVelocity = Vector2.zero;
@@ -171,9 +171,6 @@ public class PlayerController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
-        // ... 나머지 아이템 및 Finish 로직 ...
-
-        // PlayerController.cs 내부의 OnTriggerEnter2D 수정
         if (collision.CompareTag("Finish"))
         {
             // 1. 현재 맵에 보스가 있는지 확인합니다.
@@ -214,7 +211,7 @@ public class PlayerController : MonoBehaviour
     {
         jumpForce = originalJumpForce * jumpBoostMultiplier;
 
-        // 캐릭터 색상을 점프 물약 느낌(예: 초록색)으로 살짝 변경
+        // 캐릭터 색상을 점프 물약 느낌으로 변경
         Color originalColor = spriteRenderer.color;
         spriteRenderer.color = new Color(0.5f, 1f, 0.5f, 1f);
 
@@ -226,11 +223,11 @@ public class PlayerController : MonoBehaviour
     private IEnumerator SpeedBoostRoutine()
     {
         moveSpeed = originalMoveSpeed * speedBoostMultiplier;
-        isMakingGhost = true; // 💨 잔상 켜기
+        isMakingGhost = true; //  잔상 켜기
 
         yield return new WaitForSeconds(speedBoostTime);
 
-        isMakingGhost = false; // 🛑 잔상 끄기
+        isMakingGhost = false; //  잔상 끄기
         moveSpeed = originalMoveSpeed;
     }
     // 몬스터와 물리적으로 부딪혔을 때 (Is Trigger가 꺼져 있을 때)

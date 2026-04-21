@@ -3,11 +3,11 @@ using UnityEngine;
 public class EnemyTraceController : MonoBehaviour
 {
     public float moveSpeed = 5f;
-    public float raycastDistance = 2f; // 너무 짧으면 감지가 잘 안되니 0.5 정도로 추천해요.
+    public float raycastDistance = 2f;
     public float traceDistance = 5f;
 
     private Transform player;
-    private bool isFacingRight = false; // 기본 이미지가 왼쪽을 보면 false, 오른쪽이면 true
+    private bool isFacingRight = false;
 
     private void Start()
     {
@@ -16,11 +16,11 @@ public class EnemyTraceController : MonoBehaviour
         if (playerObj != null)
         {
             player = playerObj.transform;
-            Debug.Log("플레이어 인식 성공! 이름: " + playerObj.name);
+            Debug.Log("플레이어 인식 성공 " + playerObj.name);
         }
         else
         {
-            Debug.LogError("플레이어를 못 찾았습니다! 태그를 확인하세요.");
+            Debug.LogError("플레이어를 못 찾았습니다 태그를 확인하세요.");
         }
     }
 
@@ -37,7 +37,7 @@ public class EnemyTraceController : MonoBehaviour
 
         Vector2 dirNormalized = direction.normalized;
 
-        // 2. 장애물 감지 (RaycastAll 대신 Raycast 하나로 처리하는 게 더 깔끔합니다)
+        // 2. 장애물 감지
         // Obstacle 태그가 달린 물체를 감지
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dirNormalized, raycastDistance);
         Debug.DrawRay(transform.position, dirNormalized * raycastDistance, Color.red);
@@ -59,7 +59,7 @@ public class EnemyTraceController : MonoBehaviour
         // 3. 바라보는 방향 전환 (Flip) 호출
         Flip(finalDirection.x);
 
-        // 4. 이동 처리 (Space.World를 넣어야 계산된 월드 좌표대로 정확히 움직입니다)
+        // 4. 이동 처리 (Space.World를 넣어야 계산된 월드 좌표대로 정확히 움직임)
         transform.Translate(finalDirection * moveSpeed * Time.deltaTime, Space.World);
     }
 

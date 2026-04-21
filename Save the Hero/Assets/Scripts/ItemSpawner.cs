@@ -4,7 +4,7 @@ using System.Collections;
 public class ItemSpawner : MonoBehaviour
 {
     [Header("Item Settings")]
-    public GameObject[] itemPrefabs;    // 소환할 아이템 프리팹들 (Speed, Jump, Invincible 등)
+    public GameObject[] itemPrefabs;    // 소환할 아이템 프리팹들 
     public Transform[] spawnPoints;     // 아이템이 나타날 위치들 (빈 오브젝트들)
 
     [Header("Spawn Interval")]

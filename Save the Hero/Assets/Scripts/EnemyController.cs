@@ -79,7 +79,7 @@ public class EnemyController : MonoBehaviour
             // 1. 방향 전환
             isMovingRight = !isMovingRight;
 
-            // 2. [팁] 방향을 틀자마자 살짝 앞으로 밀어주기 (연속 충돌 방지)
+            // 2. 방향을 틀자마자 살짝 앞으로 밀어주기 (연속 충돌 방지)
             float pushOffset = isMovingRight ? 0.1f : -0.1f;
             transform.position += new Vector3(pushOffset, 0, 0);
 
@@ -92,7 +92,7 @@ public class EnemyController : MonoBehaviour
         if (groundCheck != null)
         {
             Gizmos.color = Color.red;
-            // 실제 바닥을 체크하는 범위를 빨간 원으로 그려줍니다.
+            // 실제 바닥을 체크하는 범위를 빨간 원으로 그리기
             Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
         }
     }

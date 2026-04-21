@@ -52,7 +52,7 @@ public class LevelNameController : MonoBehaviour
             yield return null;
         }
 
-        // 4. 완료 후 오브젝트 비활성화 (선택 사항)
+        // 4. 완료 후 오브젝트 비활성화
         gameObject.SetActive(false);
     }
 }
