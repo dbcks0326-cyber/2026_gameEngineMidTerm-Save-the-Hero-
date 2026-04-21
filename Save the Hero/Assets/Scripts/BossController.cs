@@ -58,36 +58,21 @@ public class BossController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    // BossController.cs
+    public void TakeDamage() // private을 public으로 변경
     {
-        if (isDead || isInvincible) return;
+        if (isDead || isInvincible) return; // 무적 상태면 무시
 
-        if (collision.CompareTag("Player"))
-        {
-            Rigidbody2D playerRb = collision.GetComponent<Rigidbody2D>();
-
-            if (playerRb != null && playerRb.linearVelocity.y < -0.1f)
-            {
-                TakeDamage();
-                playerRb.linearVelocity = Vector2.zero;
-                playerRb.AddForce(Vector2.up * 10f, ForceMode2D.Impulse);
-            }
-        }
-    }
-
-    void TakeDamage()
-    {
         bossHP--;
-        if (bossHP <= 0)
-        {
-            BossDeath();
-        }
+        if (bossHP <= 0) BossDeath();
         else
         {
             if (anim != null) anim.SetTrigger("Hit");
             StartCoroutine(HitCooldownRoutine());
         }
     }
+
+    
 
     IEnumerator HitCooldownRoutine()
     {

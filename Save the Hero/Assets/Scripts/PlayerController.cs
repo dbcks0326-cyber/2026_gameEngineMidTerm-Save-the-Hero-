@@ -148,19 +148,31 @@ public class PlayerController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             return;
         }
+        // 1. 보스 약점(머리 위 오브젝트)을 밟았을 때
+        if (collision.CompareTag("Boss"))
+        {
+            // 부모 오브젝트(Boss)에 있는 BossController를 가져옵니다.
+            BossController boss = collision.GetComponentInParent<BossController>();
 
-        // 2. 적(Enemy) 태그 트리거 (보스 머리 등)
+            if (boss != null && rb.linearVelocity.y < -0.1f)
+            {
+                boss.TakeDamage(); // 보스 대미지!
+
+                // 플레이어 반동
+                rb.linearVelocity = Vector2.zero;
+                rb.AddForce(Vector2.up * 10f, ForceMode2D.Impulse);
+            }
+        }
+
+        // 2. 일반 적이나 보스 몸체 트리거에 닿았을 때 (옆면 등)
         if (collision.CompareTag("Enemy"))
         {
             if (isInvincible) return;
-
-            // 떨어지는 중이 아닐 때만 죽음 (옆에서 닿았을 때)
-            if (rb.linearVelocity.y >= -0.1f)
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
-            // 떨어지는 중(밟는 중)이면 보스 스크립트가 처리하도록 가만히 둠
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+
+        // ... 나머지 아이템 및 Finish 로직 ...
+
         // PlayerController.cs 내부의 OnTriggerEnter2D 수정
         if (collision.CompareTag("Finish"))
         {
@@ -225,13 +237,14 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
-        {
-            if (isInvincible) return; // 무적 상태면 살려줌
+       {
+           if (isInvincible) return; // 무적 상태면 살려줌
 
-            // 씬 재시작 (죽음)
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-    }
+           // 씬 재시작 (죽음)
+           SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+       }
+  }
+
     void GoToNextLevel(Collider2D collision)
     {
         LevelObject lo = collision.GetComponent<LevelObject>();

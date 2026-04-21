@@ -29,5 +29,8 @@ public class TitleManager : MonoBehaviour
     {
         SceneManager.LoadScene("Main");
     }
-  
+    public void bossScene()
+    {
+        SceneManager.LoadScene("level 5");
+    }
 }
