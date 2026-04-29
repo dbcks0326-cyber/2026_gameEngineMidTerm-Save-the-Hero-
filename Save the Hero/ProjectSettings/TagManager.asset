@@ -11,6 +11,7 @@ TagManager:
   - Obstacle
   - JumpItem
   - Boss
+  - Coin
   layers:
   - Default
   - TransparentFX

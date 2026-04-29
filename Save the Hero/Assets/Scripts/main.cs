@@ -7,6 +7,8 @@ public class TitleManager : MonoBehaviour
 
     public GameObject helpPanel;
 
+    public GameObject scorePanel;
+
     public void GameStart()
     {
         SceneManager.LoadScene("level 1");
@@ -32,5 +34,17 @@ public class TitleManager : MonoBehaviour
     public void bossScene()
     {
         SceneManager.LoadScene("level 5");
+    }
+
+    public void Openscore()
+    {
+        scorePanel.SetActive(true);
+
+    }
+
+    public void Closescore()
+    {
+        scorePanel.SetActive(false);
+
     }
 }

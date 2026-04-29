@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public Transform groundCheck;
     public LayerMask groundLayer;
 
+    float score;
+
     private Rigidbody2D rb;
     private bool isGrounded;
     private float moveInput;
@@ -48,6 +50,7 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalMoveSpeed = moveSpeed;
         originalJumpForce = jumpForce; // ⭐ 원래 점프 힘을 미리 저장
+        score = 0f;
     }
 
     private void Update()
@@ -129,6 +132,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        if (collision.CompareTag("Coin"))
+        {
+            Destroy(collision.gameObject);
+            score += 1000f; 
+        }
+
         if (collision.CompareTag("SpeedItem"))
         {
             Destroy(collision.gameObject);
@@ -174,23 +183,24 @@ public class PlayerController : MonoBehaviour
         if (collision.CompareTag("Finish"))
         {
             // 1. 현재 맵에 보스가 있는지 확인합니다.
+            HighScore.TrySet(SceneManager.GetActiveScene().buildIndex, (int)score); 
             BossController boss = GameObject.FindObjectOfType<BossController>();
 
             if (boss != null)
             {
-                // 2. 보스가 있다면? 죽었을 때만 통과!
+                // 2. 보스가 있다면? 죽었을 때만 통과
                 if (BossController.isBossDead)
                 {
                     GoToNextLevel(collision);
                 }
                 else
                 {
-                    Debug.Log("보스를 아직 처치하지 않았습니다!");
+                    Debug.Log("보스를 아직 처치하지 않았습니다");
                 }
             }
             else
             {
-                // 3. 보스가 없는 일반 스테이지라면? 그냥 통과!
+                // 3. 보스가 없는 일반 스테이지라면? 그냥 통과
                 GoToNextLevel(collision);
             }
         }
