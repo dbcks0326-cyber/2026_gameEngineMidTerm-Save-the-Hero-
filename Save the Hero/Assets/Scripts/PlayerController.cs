@@ -129,13 +129,15 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collision.gameObject);
             StartCoroutine(InvincibilityRoutine());
+
             return;
         }
 
         if (collision.CompareTag("Coin"))
         {
             Destroy(collision.gameObject);
-            score += 1000f; 
+            score += 1000f;
+            Destroy(collision.gameObject);
         }
 
         if (collision.CompareTag("SpeedItem"))
@@ -182,8 +184,7 @@ public class PlayerController : MonoBehaviour
 
         if (collision.CompareTag("Finish"))
         {
-            // 1. 현재 맵에 보스가 있는지 확인합니다.
-            HighScore.TrySet(SceneManager.GetActiveScene().buildIndex, (int)score); 
+            StageResultSaver.SaveStage(SceneManager.GetActiveScene().buildIndex, (int)score);
             BossController boss = GameObject.FindObjectOfType<BossController>();
 
             if (boss != null)

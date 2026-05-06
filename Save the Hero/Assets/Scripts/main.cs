@@ -9,6 +9,8 @@ public class TitleManager : MonoBehaviour
 
     public GameObject scorePanel;
 
+    public GameObject rankPanel;
+
     public void GameStart()
     {
         SceneManager.LoadScene("level 1");
@@ -45,6 +47,18 @@ public class TitleManager : MonoBehaviour
     public void Closescore()
     {
         scorePanel.SetActive(false);
+
+    }
+
+    public void Openranke()
+    {
+        rankPanel.SetActive(true);
+
+    }
+
+    public void Closeranke()
+    {
+        rankPanel.SetActive(false);
 
     }
 }
