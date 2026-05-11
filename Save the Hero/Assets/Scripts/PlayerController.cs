@@ -136,8 +136,8 @@ public class PlayerController : MonoBehaviour
         if (collision.CompareTag("Coin"))
         {
             Destroy(collision.gameObject);
-            score += 1000f;
-            Destroy(collision.gameObject);
+            score += collision.GetComponent<itemOB>().Getpoint();
+            //score += 1000f;
         }
 
         if (collision.CompareTag("SpeedItem"))

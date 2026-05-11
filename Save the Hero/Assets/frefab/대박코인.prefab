@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4003541605393362699}
   - component: {fileID: 4571575216371121388}
   m_Layer: 0
-  m_Name: Coin
+  m_Name: "\uB300\uBC15\uCF54\uC778"
   m_TagString: Coin
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 13.81721, y: 10.90766, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3.4414, y: 3.4414, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -151,4 +151,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1715751b3164f7f4aa723bfc7ec66319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::itemOB
-  data: {fileID: 11400000, guid: 3f5bc4f6cd6377146b68e20a74a7ad7a, type: 2}
+  data: {fileID: 11400000, guid: 5c0712beaa5aab3479ee299ea46c9062, type: 2}

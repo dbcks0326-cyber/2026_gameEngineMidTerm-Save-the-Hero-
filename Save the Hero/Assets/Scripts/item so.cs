@@ -5,4 +5,4 @@ public class itemso : ScriptableObject
 {
         [Header("Score Value")]
         public int point = 10;
-    }
+}
